@@ -6,6 +6,7 @@ from tqdm.autonotebook import tqdm
 from torch.optim.lr_scheduler import _LRScheduler
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
+import torch_geometric
 
 from packaging import version
 
@@ -29,14 +30,19 @@ class DataLoaderIter(object):
         return self.data_loader.dataset
 
     def inputs_labels_from_batch(self, batch_data):
-        if not isinstance(batch_data, list) and not isinstance(batch_data, tuple):
+        if isinstance(batch_data, list) or isinstance(batch_data, tuple):
+            inputs, labels, *_ = batch_data
+
+        elif isinstance(batch_data, torch_geometric.data.batch.Batch):
+            inputs, labels = batch_data.x, batch_data.y
+
+        else:
             raise ValueError(
                 "Your batch type is not supported: {}. Please inherit from "
                 "`TrainDataLoaderIter` or `ValDataLoaderIter` and override the "
                 "`inputs_labels_from_batch` method.".format(type(batch_data))
             )
 
-        inputs, labels, *_ = batch_data
 
         return inputs, labels
 
