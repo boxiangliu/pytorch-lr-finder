@@ -34,8 +34,8 @@ class DataLoaderIter(object):
             inputs, labels, *_ = batch_data
 
         elif isinstance(batch_data, torch_geometric.data.batch.Batch):
-            inputs, labels = batch_data.x, batch_data.y
-
+            inputs = {"x": batch_data.x, "edge_index": batch_data.edge_index}
+            labels = batch_data.y
         else:
             raise ValueError(
                 "Your batch type is not supported: {}. Please inherit from "
